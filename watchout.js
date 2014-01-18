@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  debugger;
+
   /****************************
     Game Options Initialized
   *****************************/
