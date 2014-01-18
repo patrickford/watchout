@@ -1,5 +1,5 @@
 $(document).ready(function() {
-
+  debugger;
   /****************************
     Game Options Initialized
   *****************************/
@@ -56,10 +56,11 @@ $(document).ready(function() {
     instance.render = function(to) {
       this.el = to.append('svg:path').attr('d', this.path).attr('fill', this.fill);
       this.transform({
-        x: this.gameOptions.width * 0.5,
-        y: this.gameOptions.height * 0.5
+        x: gameOptions.width * 0.5,
+        y: gameOptions.height * 0.5
       });
       this.setUpDragging();
+      return this;
     };
 
     instance.getX = function() {
@@ -67,14 +68,15 @@ $(document).ready(function() {
     };
 
     instance.setX = function(x) {
-      var minX = this.gameOptions.padding;
-      var maxX = this.gameOptions.width - this.gameOptions.padding;
+      var minX = gameOptions.padding;
+      var maxX = gameOptions.width - gameOptions.padding;
       if (x <= minX) {
         x = minX;
       }
       if (x >= maxX) {
         x = maxX;
       }
+      this.x = x;
     };
 
     instance.getY = function() {
@@ -82,21 +84,23 @@ $(document).ready(function() {
     };
 
     instance.setY = function(y) {
-      var minY = this.gameOptions.padding;
-      var maxY = this.gameOptions.height - this.gameOptions.padding;
+      var minY = gameOptions.padding;
+      var maxY = gameOptions.height - gameOptions.padding;
       if (y <= minY) {
         y = minY;
       }
       if (y >= maxY) {
         y = maxY;
       }
+      this.y = y;
     };
 
     instance.transform = function(opts) {
       this.angle = opts.angle || this.angle;
       this.setX(opts.x || this.x);
       this.setY(opts.y || this.y);
-      this.el.attr('transform', ("rotate(" + this.angle + "," + (this.getX()) + "," + (this.getY()) + ") ") + ("translate(" + (this.getX()) + "," + (this.getY()) + ")"));
+      console.log(this.getX(), this.getY());
+      this.el.attr('transform', ("rotate(" + this.angle + "," + this.getX() + "," + this.getY() + ") ") + ("translate(" + (this.getX()) + "," + (this.getY()) + ")"));
     };
 
     instance.moveAbsolute = function(x, y) {
@@ -106,7 +110,6 @@ $(document).ready(function() {
       });
     };
 
-  /*****  LOOK UP MATH HERE *******/
     instance.moveRelative = function(dx, dy) {
       this.transform({
         x: this.getX() + dx,
@@ -120,16 +123,16 @@ $(document).ready(function() {
       var dragMove = function() {
         return _this.moveRelative(d3.event.dx, d3.event.dy);
       };
-      var drag  = d3.behaviour.drag().on('drag', dragMove);
-      return this.el.call(drag);
+      var drag = d3.behavior.drag().on('drag', dragMove);
+      console.log(this.el);
+      return drag.call(this.el);
     };
 
     return instance;
-  };
+  }();
 
   var players = [];
-
-  players.push(player().render(gameBoard));
+  players.push(player.render(gameBoard));
 
 
   /****************************
@@ -157,29 +160,73 @@ $(document).ready(function() {
       return axes.x(enemy.x); // how does this parameter fit into the axes.x call
     }).attr('cy', function(enemy) {
       return axes.y(enemy.y);
-    }).attr('r', 50);
+    }).attr('r', 0);
 
     enemies.exit().remove();
+
+    var checkCollision = function(enemy, collidedCallback) {
+      return _(players).each(function(player) {
+        var radiusSum = parseFloat(enemy.attr('r')) + player.r;
+        var xDiff = parseFloat(enemy.attr('cx')) - player.x;
+        var yDiff = parseFloat(enemy.attr('cy')) - player.y;
+        var separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+        if (separation < radiusSum) {
+          return collidedCallback(player, enemy);
+        }
+      });
+    };
+
+    onCollision = function() {
+      updateBestScore();
+      gameStats.score = 0;
+      return updateScore();
+    };
+
+    tweenWithCollisionDetection = function(endData) {
+      var enemy = d3.select(this);
+
+      var startPos = {
+        x: parseFloat(enemy.attr('cx')),
+        y: parseFloat(enemy.attr('cy'))
+      };
+
+      var endPos = {
+        x: axes.x(endData.x),
+        y: axes.y(endData.y)
+      };
+
+      return function(t) {
+        checkCollision(enemy, onCollision);
+        var enemyNextPos = {
+          x: startPos.x + (endPos.x - startPos.x) * t,
+          y: startPos.y + (endPos.y - startPos.y) * t
+        };
+        return enemy.attr('cx', enemyNextPos.x).attr('cy', enemyNextPos.y);
+      };
+    };
+
+    enemies.transition().duration(500).attr('r', 10)
+      .transition().duration(2000)
+      .tween('custom', tweenWithCollisionDetection);
   };
 
+  var play = function() {
 
-  var gameTurn = function() {
-    var newEnemyPositions = createEnemies();
-    render(newEnemyPositions);
+    var gameTurn = function() {
+      var newEnemyPositions = createEnemies();
+      return render(newEnemyPositions);
+    };
+
+    var increaseScore = function() {
+      gameStats.score += 1;
+      return updateScore();
+    };
+
+    gameTurn();
+    setInterval(gameTurn, 2000);
+    setInterval(increaseScore, 50);
   };
 
-  gameTurn();
-  setInterval(gameTurn, 1000);
-  
-
-
-
-
-
-
-
-
-
+  play();
 
 });
-  
