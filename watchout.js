@@ -33,6 +33,15 @@ $(document).ready(function() {
                     .attr('width', gameOptions.width)
                     .attr('height', gameOptions.height);
 
+  var updateBestScore = function() {
+    gameStats.bestScore = _.max([gameStats.bestScore, gameStats.score]);
+    d3.select('#best-score').text(gameStats.bestScore.toString());
+  };
+
+  var updateScore = function() {
+    d3.select('#current-score').text(gameStats.score.toString());
+  };
+
 
   /****************************
     Enemies Functions
@@ -65,9 +74,14 @@ $(document).ready(function() {
   };
 
 
-  var newEnemyPositions = createEnemies();
-
+  var gameTurn = function() {
+    var newEnemyPositions = createEnemies();
     render(newEnemyPositions);
+  };
+
+  gameTurn();
+  setInterval(gameTurn, 1000);
+  
 
 
 
