@@ -2,18 +2,15 @@
 <html>
   <head>
     <title>Tag Cloud</title>
-<!--    <link href='watchout.css' rel='stylesheet'\>  -->
+    <link href='watchout.css' rel='stylesheet'\>  
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<!--    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
--->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    
+    <script src="./tagCloud.js"></script>
+  
   </head>
-<script src="./tagCloud.js"></script>
   <body>
-    <h1>Tag Cloud</h1>
  
-
     <script>
     $(document).ready(function() {
       var copy = "Four score and seven years ago our fathers brought forth on this continent a new nation, \
@@ -35,19 +32,25 @@ that government of the people, by the people, for the people, shall not perish f
     var wordFrequency = wordCount(copy);
     dataArray = [];
     for (key in wordFrequency) {
-      dataArray.push([wordFrequency[key]]);
+//      dataArray.push([wordFrequency[key]]);
+      dataArray.push({key : wordFrequency[key]})
     };
 
-console.dir(dataArray);
-
-    var options = {
-      height: 1200,
-      width: 1200
-    }
+    var w = window.innerWidth;
+    var h = window.innerHeight;
 
     var svg = d3.select('body').append('svg');
-    svg.style('width', 1200).style('height', 1200);
-    svg.selectAll('circle').data(dataArray).enter().append('circle').attr('r', function(d) {return d*5}).attr('cx', function(){return Math.random()*options.width}).attr('cy', function(){return Math.random()*options.height});
+
+    svg.style('width', w).style('height', h);
+
+    var text = svg.selectAll('text').data(dataArray)
+
+    text.enter().append('text')
+      .attr('class', 'enter')
+      .attr('x', function(){return Math.random()*w})
+      .attr('dy', function(){return Math.random()*h});
+
+    text.text(function(d) {return d; });
 
 //      $('#word-count').append('<div>' + key + " : " + wordFrequency[key] + '</div>');
 //    }
