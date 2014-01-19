@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Tag Cloud</title>
-    <link href='watchout.css' rel='stylesheet'\>  
+    <link href='tagCloud.css' rel='stylesheet'\>  
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -29,34 +29,35 @@ cause for which they gave the last full measure of devotion that we here highly 
 dead shall not have died in vain that this nation, under God, shall have a new birth of freedom and \
 that government of the people, by the people, for the people, shall not perish from the earth.";
       
-    var wordFrequency = wordCount(copy);
-    dataArray = [];
-    for (key in wordFrequency) {
-//      dataArray.push([wordFrequency[key]]);
-      dataArray.push({key : wordFrequency[key]})
-    };
+      var wordFrequency = wordCount(copy);
+      dataArray = [];
+      for (key in wordFrequency) {
+  //     dataArray.push({ key : wordFrequency} );
+        dataArray.push(key);
+  //      dataArray.push({key : wordFrequency[key]})
+      };
 
-    var w = window.innerWidth;
-    var h = window.innerHeight;
+      var w = window.innerWidth;
+      var h = window.innerHeight;
 
-    var svg = d3.select('body').append('svg');
+      var svg = d3.select('body').append('svg');
 
-    svg.style('width', w).style('height', h);
+      svg.style('width', w)
+         .style('height', h);
 
-    var text = svg.selectAll('text').data(dataArray)
+      var text = svg.selectAll('text')
+                    .data(dataArray);
 
-    text.enter().append('text')
-      .attr('class', 'enter')
-      .attr('x', function(){return Math.random()*w})
-      .attr('dy', function(){return Math.random()*h});
+      text.enter().append('text')
+          .attr('class', 'enter')
+ //       .attr('font-size', function(d) { return d.value * 4; })
+          .attr('x', function(){return Math.random()*w})
+          .attr('dy', function(){return Math.random()*h});
 
-    text.text(function(d) {return d; });
+      text.text(function(d) {return d; });
 
-//      $('#word-count').append('<div>' + key + " : " + wordFrequency[key] + '</div>');
-//    }
+    });
 
-  });
-
-  </script>
+    </script>
   </body>
 </html>
