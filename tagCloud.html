@@ -31,9 +31,10 @@ that government of the people, by the people, for the people, shall not perish f
         var wordFrequency = countWords(copy);
         dataArray = [];
         for (key in wordFrequency) {
-           dataArray.push(key);
-    //     dataArray.push({ key : wordFrequency} );
-    //     dataArray.push({key : wordFrequency[key]})
+    //    dataArray.push(key);
+          dataArray.push(key, wordFrequency[key]);
+    //    dataArray.push({ key : wordFrequency} );
+    //    dataArray.push({key : wordFrequency[key]})
         };
 
         var w = window.innerWidth;
